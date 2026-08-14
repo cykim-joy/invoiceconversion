@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import pandas as pd
 import io
@@ -8,13 +7,7 @@ from utils.excel_exporter import export_to_excel
 from utils.postal_code import get_postal_code
 from utils.db_manager import load_product_db, save_product_db, lookup_product
 from utils.config_manager import load_config, save_config
-from utils.auth import (
-    is_authenticated, handle_oauth_callback,
-    show_login_page, logout, get_session_info,
-)
-
-# localhost HTTP 허용 (개발 환경)
-os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
+from utils.auth import is_authenticated, show_login_page, logout, get_session_info
 
 # ─── 페이지 설정 ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -24,32 +17,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─── Google OAuth 설정 로드 ──────────────────────────────────────────────────
-_cfg = load_config()
-
+# ─── 카카오 API 키 로드 ──────────────────────────────────────────────────────
 def _secret(key: str, fallback: str = "") -> str:
-    """로컬: config.json / Streamlit Cloud: st.secrets 우선"""
+    """Streamlit Cloud는 st.secrets, 로컬은 config.json"""
     try:
         val = st.secrets.get(key, None)
         if val:
             return val
     except Exception:
         pass
-    return _cfg.get(key, fallback)
-
-_client_id     = _secret("google_client_id")
-_client_secret = _secret("google_client_secret")
-_redirect_uri  = _secret("redirect_uri", "http://localhost:8501")
-
-# ─── OAuth 콜백 처리 (Google → 앱으로 리디렉션됐을 때) ──────────────────────
-if "code" in st.query_params:
-    success = handle_oauth_callback(_client_id, _client_secret, _redirect_uri)
-    if success:
-        st.rerun()   # 인증 완료 → 메인 앱으로
+    return load_config().get(key, fallback)
 
 # ─── 인증 확인 ───────────────────────────────────────────────────────────────
 if not is_authenticated():
-    show_login_page(_client_id, _client_secret, _redirect_uri)
+    show_login_page()
     st.stop()
 
 # ─── 로그인 세션 정보 (사이드바) ────────────────────────────────────────────
@@ -59,7 +40,6 @@ with st.sidebar:
         st.image(info["picture"], width=48)
     st.markdown(f"**{info.get('name', '')}**")
     st.caption(info.get("email", ""))
-    st.caption(f"세션 만료까지 {info['remaining_hours']}시간 {info['remaining_minutes']}분")
     st.divider()
     if st.button("🚪 로그아웃", use_container_width=True):
         logout()
