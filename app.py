@@ -67,10 +67,18 @@ st.markdown("""
       font-weight: bold;
       margin-right: 6px;
   }
-  /* MANAGE APP 버튼 숨기기 */
+  /* MANAGE APP 버튼 및 Streamlit 하단 UI 완전 숨기기 */
+  #MainMenu { visibility: hidden !important; display: none !important; }
+  header { visibility: hidden !important; }
+  footer { display: none !important; }
   .stDeployButton { display: none !important; }
   [data-testid="stDeployButton"] { display: none !important; }
-  footer { visibility: hidden !important; }
+  [data-testid="stToolbar"] { display: none !important; }
+  [data-testid="stDecoration"] { display: none !important; }
+  [data-testid="stStatusWidget"] { display: none !important; }
+  [data-testid="stBottom"] { display: none !important; }
+  [data-testid="stAppToolbarActions"] { display: none !important; }
+  iframe[title="st_footer"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
