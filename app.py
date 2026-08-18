@@ -67,6 +67,10 @@ st.markdown("""
       font-weight: bold;
       margin-right: 6px;
   }
+  /* MANAGE APP 버튼 숨기기 */
+  .stDeployButton { display: none !important; }
+  [data-testid="stDeployButton"] { display: none !important; }
+  footer { visibility: hidden !important; }
 </style>
 """, unsafe_allow_html=True)
 
